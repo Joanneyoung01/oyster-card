@@ -3,7 +3,7 @@ require 'Oystercard'
 describe Oystercard do
 
   let (:station) {double :station}
-  
+
   it 'has a balance of zero' do
     expect(subject.balance).to eq(0)
   end
@@ -27,25 +27,7 @@ describe Oystercard do
     expect(subject).to respond_to(:deduct).with(1).argument
   end
 
-  it 'should deduct fare from balance' do
-    subject.top_up(10)
-    expect(subject.deduct(5)). to eq 5
-  end
-
   it 'is initially not in journey' do
-    expect(subject).not_to be_in_journey
-  end
-
-  it 'can touch in' do
-    subject.top_up(15)
-    subject.touch_in(station)
-    expect(subject).to be_in_journey
-  end
-
-  it 'can touch out' do
-    subject.top_up(15)
-    subject.touch_in(station)
-    subject.touch_out
     expect(subject).not_to be_in_journey
   end
 
@@ -53,15 +35,36 @@ describe Oystercard do
     expect{subject.touch_in(station)}.to raise_error "Please top up"
   end
 
-  it 'deducts fare from balance' do
-    subject.top_up(15)
-    subject.touch_in(station)
-    expect { subject.touch_out }.to change{ subject.balance}.by(-Oystercard::MINIMUM_CHARGE)
+  context 'when card is topped up with 15' do
+    before do
+      subject.top_up(15)
+    end
+
+    it 'should deduct fare from balance' do
+      expect(subject.deduct(5)). to eq 10
+    end
+  
+    it 'can touch in' do
+      subject.touch_in(station)
+      expect(subject).to be_in_journey
+    end
+  
+    it 'can touch out' do
+      subject.touch_in(station)
+      subject.touch_out
+      expect(subject).not_to be_in_journey
+    end
+  
+    it 'deducts fare from balance' do
+      subject.touch_in(station)
+      expect { subject.touch_out }.to change{ subject.balance}.by(-Oystercard::MINIMUM_CHARGE)
+    end
+  
+    it "remembers the entry station" do
+      subject.touch_in(station)
+      expect(subject.entry_station). to eq station
+    end
+
   end
 
-  it "remembers the entry station" do
-    subject.top_up(15)
-    subject.touch_in(station)
-    expect(subject.entry_station). to eq station
-  end
 end
