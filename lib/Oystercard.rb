@@ -1,3 +1,5 @@
+require_relative 'station'
+
 class Oystercard
 
   MIN_CHARGE = 1

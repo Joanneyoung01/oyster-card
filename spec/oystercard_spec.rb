@@ -71,6 +71,6 @@ describe Oystercard do
   end
 
   describe 'in_journey?' do
-    specify { expect(subject.in_journey?).not_to be_truthy }
+    specify { expect(subject.in_journey?).to be_falsey }
   end
 end
