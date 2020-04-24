@@ -2,7 +2,7 @@ class Oystercard
 
   MIN_CHARGE = 1
   MAX_BALANCE = 90
-  attr_reader :balance, :entry_station, :history
+  attr_reader :balance, :entry_station, :exit_station, :history
   attr_accessor :entry_station, :exit_station
 
   def initialize
@@ -27,15 +27,14 @@ class Oystercard
   end
 
   def touch_out(station)
-    deduct
-    @entry_station = nil
     @exit_station = station
     store_journey
-    @exit_station = nil
+    deduct
   end
 
   def store_journey
-    @history[entry_station] = exit_station
+    @history[:entry_station] = entry_station
+    @history[:exit_station] = exit_station
   end
 
   private

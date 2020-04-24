@@ -23,44 +23,50 @@ describe Oystercard do
   end
 
   context 'it has a balance' do
-    before(:all) do
-      subject.top_up(Oystercard::MAX_BALANCE)
-
-      let(:station){ double :station }
-      it 'remembers the entry station' do
-        subject.touch_in(station)
-        expect(subject.entry_station).to eq station
-      end
-
-      it 'deducts money when you touch out' do
-        expect { subject.touch_out(station) }.to change{ subject.balance }.by -Oystercard::MIN_CHARGE
-      end
-
-      describe 'lets you touch out' do
-        specify { expect(subject.touch_out(station)).not_to be_truthy }
-      end
-
-     it 'lets you touch in' do
-        specify { expect(subject.touch_in).to be_truthy }
-      end
-
-      let(:journey) {{entry_station: entry_station, exit_station: exit_station}}
-      it 'store the journey' do
-        subject.touch_in('entry')
-        subject.touch_out('exit')
-        expect(subject.history).to include(:journey)
-      end
+    before do
+      subject.top_up(15)
     end
+
+    let(:station){ double :station }
+    it 'remembers the entry station' do
+      subject.touch_in(station)
+      expect(subject.entry_station).to eq station
+    end
+
+    it 'deducts money when you touch out' do
+      expect { subject.touch_out(station) }.to change{ subject.balance }.by -Oystercard::MIN_CHARGE
+    end
+
+    describe 'lets you touch out' do
+      specify { expect(subject.touch_out(station)).not_to be_falsey }
+    end
+
+    let(:entry_station) { double :station }
+    let(:exit_station) { double :station }
+
+    it 'stores exit station' do
+    subject.touch_in(entry_station)
+    subject.touch_out(exit_station)
+    expect(subject.exit_station).to eq exit_station
+    end
+
+    describe 'lets you touch in' do
+      specify { expect(subject.touch_in(station)).to be_truthy }
+    end
+
+    let(:journey){ {entry_station: entry_station, exit_station: exit_station} }
+    it 'stores a journey' do
+      subject.touch_in(entry_station)
+      subject.touch_out(exit_station)
+      expect(subject.history).to include journey
+    end
+    
   end
 
   context 'it has low or no balance' do
-    before(:all) do
-      subject.top_up(Oystercard::MIN_CHARGE)
-
-      it 'throws an error if isufficient funds' do
-        min_balance = Oystercard::MIN_CHARGE
-        expect{ subject.touch_in }.to raise_error("Insufficient funds")
-      end
+    let(:station){ double :station }
+    it 'throws an error if isufficient funds' do
+      expect{ subject.touch_in(station) }.to raise_error("Insufficient funds")
     end
   end
 
