@@ -3,7 +3,6 @@ require 'oystercard'
 describe Oystercard do
 
   let(:entry_station) { double :station }
-  let(:exit_station) { double :station }
 
   it 'has an empty hash' do
     expect(subject.history).to be_empty
@@ -44,12 +43,6 @@ describe Oystercard do
      it 'lets you touch in' do
         specify { expect(subject.touch_in).to be_truthy }
       end
-    end
-  end
-
-  context 'it has low or no balance' do
-    before(:all) do
-      subject.top_up(Oystercard::MIN_CHARGE)
 
       let(:journey) {{entry_station: entry_station, exit_station: exit_station}}
       it 'store the journey' do
@@ -57,6 +50,12 @@ describe Oystercard do
         subject.touch_out('exit')
         expect(subject.history).to include(:journey)
       end
+    end
+  end
+
+  context 'it has low or no balance' do
+    before(:all) do
+      subject.top_up(Oystercard::MIN_CHARGE)
 
       it 'throws an error if isufficient funds' do
         min_balance = Oystercard::MIN_CHARGE
